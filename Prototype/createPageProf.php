@@ -130,30 +130,50 @@ else{
                 <button type="button" @click="addModule();">Confirm</button>
               </div>
             </div>
-            </form>';
-        }
-        else{
-            $module = $Details->getMod();
-            echo "<table class='modTab'>
-                <tr>
-                    <th>Module Name</th>
-                    <th>Component</th>
-                    <th>Weight</th>
-                    <th>Sub-Component</th>
-                    <th>Weight</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-              </tr>
-              <tr>
-                  <td>". $module->getMod()."</td>
-              </tr>
-              <tr>";
-            foreach ($module->getAllComponent() as $f){
-                echo "<th>".$f->getName()."</th>";
-            }
-                    
-            echo "</tr></table>";
-        }
+          </div>
+        </div>
+        <button type="button" id="add" @click="addAssessment">
+          Add Assessment
+        </button>
+        <div>
+          <button type="button" @click="prevStep">Go Back</button>
+          <button type="button" @click="nextStep">Next</button>
+        </div>
+      </div>
+      <!-- Add Students -->
+      <div v-if="step === 3">
+        <div>
+          <h1>Add Students to Module</h1>
+          <br>
+            <input id="fileUpload" type="file" hidden>
+            <button @click="chooseFiles()">Choose</button>
+          <button type="button" @click="prevStep">Go Back</button>
+          <button type="button" @click="nextStep">Next</button>
+        </div>
+      </div>
+      <!-- Confirmation -->
+      <div v-if="step === 4">
+        <div>
+            <h1>Confirmation page</h1>
+            <br>
+            <h5>Module Name: {{ module }}</h5>
+            <h5>Module Start Date: {{ startdate }}</h5>
+            <h5>Module End Date: {{ enddate }}</h5>
+        <div v-for="(assessment, index) in assessments">
+          <div>
+            <h5>Assessment {{ index + 1 }} : {{ assessment.category }}</h5>
+            <h5>Assessment {{ index + 1 }} Weightage : {{ assessment.weightage}}</h5>
+            <div v-for="(subAssessment, subIndex) in assessment.subAssessments">
+                <h5>Sub Assessment {{ subIndex + 1 }} : {{ subAssessment.name }} : {{ subAssessment.weightage }}</h5>
+            </div>
+          </div>
+        </div>
+          <button type="button" @click="prevStep">Go Back</button>
+          <button type="button" @click="addModule();">Confirm</button>
+        </div>
+      </div>
+    </form>
+    <?php
         include "footer.php";
     ?>  
     <script src="js/createPageProf.js"></script>
