@@ -1,6 +1,7 @@
 <?php
 include "sqlConnection.php";
 
+<<<<<<< HEAD
 include "classes/users.class.php";
 include "classes/module.class.php";
 include_once "classes/usersFactory.php";
@@ -35,6 +36,22 @@ if($request == 1){
   if(mysqli_num_rows($userData) == 0){
     mysqli_query($conn,"INSERT INTO Module(module_id,module_name,start_date,end_date) VALUES('1','".$modulename."','".$startdate."','".$enddate."')");
     mysqli_query($conn,"UPDATE users SET module='1' WHERE name='".$name."'");
+=======
+$data = json_decode(file_get_contents("php://input"));
+
+$request = $data->request;
+
+// Add record
+if($request == 1){
+  $module = $data->module;
+  $startdate = $data->startdate;
+  $enddate = $data->enddate;
+  $assessment = $data->assessments;
+
+  $userData = mysqli_query($conn,"SELECT * FROM Module");
+  if(mysqli_num_rows($userData) == 0){
+    mysqli_query($conn,"INSERT INTO Module(module_id,module_name,start_date,end_date) VALUES('1','".$module."','".$startdate."','".$enddate."')");
+>>>>>>> 0b3a95921cc9c6058ea9871bd3ff37cea6ce3895
     echo "Insert successfully";
   }else{
     echo "Did not insert.";
@@ -42,12 +59,18 @@ if($request == 1){
   exit;
 }
 else if($request == 2){   
+<<<<<<< HEAD
   #$oldmod = $Details->getMod();
   $assessmentid = $data->assessmentid;
   $category = $data->category;
   $assessmentweightage = $data->assessmentweightage;
   #$oldmod->pushComponent($assessmentid, $category, $assessmentweightage);
   #$Details->setMod($oldmod);
+=======
+  $assessmentid = $data->assessmentid;
+  $category = $data->category;
+  $assessmentweightage = $data->assessmentweightage;
+>>>>>>> 0b3a95921cc9c6058ea9871bd3ff37cea6ce3895
   mysqli_query($conn,"INSERT INTO assessments(assessment_id,module_id,assessment_name,assessment_weightage) VALUES('".$assessmentid."','1','".$category."','".$assessmentweightage."')");
   exit;
 }
@@ -57,6 +80,7 @@ else if($request == 3){
   $subassessmentweightage = $data->subassessmentweightage;
   $dataprobe = mysqli_query($conn,"SELECT * FROM subAssessments");
   $subassessmentid = mysqli_num_rows($dataprobe) + 1;
+<<<<<<< HEAD
   #$oldmod = $Details->getMod();
   #$tempComp = $oldmod->getComponent($assessmentid);
   #$tempComp->pushSubComponent($subassessmentname, $subassessmentweightage);
@@ -99,3 +123,8 @@ else if($request == 5){
 }
 
 ?>
+=======
+  mysqli_query($conn,"INSERT INTO subAssessments(assessment_id,subAssessment_name,subAssessment_weightage,module_id) VALUES('".$assessmentid."','".$subassessmentname."','".$subassessmentweightage."','1')");
+  exit;
+}
+>>>>>>> 0b3a95921cc9c6058ea9871bd3ff37cea6ce3895

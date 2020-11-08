@@ -8,7 +8,6 @@ and open the template in the editor.
 <?php
 include "classes/users.class.php";
 include "classes/module.class.php";
-include "classes/ProfessorDictionaryAdapter.php";
 
 session_start();
 $Details = "";
@@ -31,9 +30,14 @@ else{
     <title>Create a module</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="css/footer.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" href="css/moduleTable.css">        
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
   </head>
   <body>
     <?php
@@ -41,7 +45,7 @@ else{
     
         if($Details->getMod() == "")
         {
-           echo '<form id="app" class="container" action="success.php" method="post" @submit="submit">
+            echo '<form id="app" class="container" action="" method="post" @submit="submit">
               <!-- Error Banner -->
               <p v-if="errors.length">
                 <b>Please correct the following error(s):</b>
@@ -99,18 +103,55 @@ else{
                 <div>
                   <h1>Add Students to Module</h1>
                   <br>
-                  {{ step }}
-                  {{ students.length }}
-                  {{ errors.length }}
-                    <input type="file" v-on:change="handleUpload" accept=".csv"/>
-                    <div v-if="students.length != 0" v-for="student in students">
-                        id: {{ student}}
-                    </div>
+                    <input id="fileUpload" type="file" hidden>
+                    <button @click="chooseFiles()">Choose</button>
                   <button type="button" @click="prevStep">Go Back</button>
                   <button type="button" @click="nextStep">Next</button>
                 </div>
               </div>
               <!-- Confirmation -->
+              <div v-if="step === 4">
+              <div>
+                  <h1>Confirmation page</h1>
+                  <br>
+                  <h5>Module Name: {{ module }}</h5>
+                  <h5>Module Start Date: {{ startdate }}</h5>
+                  <h5>Module End Date: {{ enddate }}</h5>
+              <div v-for="(assessment, index) in assessments">
+                <div>
+                  <h5>Assessment {{ index + 1 }} : {{ assessment.category }}</h5>
+                  <h5>Assessment {{ index + 1 }} Weightage : {{ assessment.weightage}}</h5>
+                  <div v-for="(subAssessment, subIndex) in assessment.subAssessments">
+                      <h5>Sub Assessment {{ subIndex + 1 }} : {{ subAssessment.name }} : {{ subAssessment.weightage }}</h5>
+                  </div>
+                </div>
+              </div>
+                <button type="button" @click="prevStep">Go Back</button>
+                <button type="button" @click="addModule();">Confirm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" id="add" @click="addAssessment">
+          Add Assessment
+        </button>
+        <div>
+          <button type="button" @click="prevStep">Go Back</button>
+          <button type="button" @click="nextStep">Next</button>
+        </div>
+      </div>
+      <!-- Add Students -->
+      <div v-if="step === 3">
+        <div>
+          <h1>Add Students to Module</h1>
+          <br>
+            <input id="fileUpload" type="file" hidden>
+            <button @click="chooseFiles()">Choose</button>
+          <button type="button" @click="prevStep">Go Back</button>
+          <button type="button" @click="nextStep">Next</button>
+        </div>
+      </div>
+      <!-- Confirmation -->
       <div v-if="step === 4">
         <div>
             <h1>Confirmation page</h1>
@@ -128,94 +169,11 @@ else{
           </div>
         </div>
           <button type="button" @click="prevStep">Go Back</button>
-          <button type="button" @click="nextStep();addModule();">Confirm</button>';
-            if($Details->getMod() != ""){
-                header("Location:createPageProf.php");
-            }
-        echo '</div>';
-        echo ' </div>';
-        echo '<div v-if="step === 5">
-                <div>
-                <h2>Success</h2>';
-                  echo '<button type="submit">Back to dashboard</button>
-                </div>
-              </div>';
-            echo '</form>';
-        }else{
-             $module = $Details->getMod();
-             $studentList = $_SESSION["studentList"];
-             echo "
-                 <div class='container' id='widgetC'>
-                 <table style='width: 100%;' class='modTab'>
-                 <tr>
-                    <th colspan='3' style='text-align: center;'>Module: ". $module->getMod()."</th>                            
-                 </tr>
-                 <tr>
-                    <th colspan='3' style='text-align: center;'>Total Enrolled: ". (string)((int)$module->getTotalEnroll() - 1)."</th>                            
-                 </tr>                 
-                 <tr>
-                     <th>Component</th>
-                     <th>Sub-Component</th>
-                     <th>Weight</th>
-               </tr>";
-             foreach ($module->getAllComponent() as $f){
-                 foreach($f -> getSub() as $g){
-                     echo "<tr>";
-                     echo "<td>".$f->getName()."</td>";
-                     echo "<td>".$g->getName()."</td>";
-                     echo "<td>".$g->getWeight()."</td>";
-                     echo "</tr>";
-                 }
-             }
-             echo "</td>";
-             echo "</tr></table></div>";
-             echo "<div class='container' id='studentC'>
-                    <table style='width: 100%;' class='modTab'>
-                         <tr>
-                             <th colspan='8' style='text-align: center;'>Enrolled Students</th>                            
-                         </tr>
-                         <tr>
-                             <th>ID</th>
-                             <th>Name</th>
-                             <th>Email</th>
-                             <th>Phone No.</th>
-                             <th>Formative Feedbacks</th>
-                             <th>Summative Feedbacks</th>
-                             <th>Scores</th>
-                             <th>Summative Feedback</th>
-                       </tr>";
-             //students
-            foreach($studentList->SelectAll() as $f){
-                echo "<tr>";
-                echo "<td>".$f->getUser()."</td>";
-                echo "<td>".$f->getName()."</td>";
-                echo "<td>".$f->getEmail()."</td>";
-                echo "<td>".$f->getTel()."</td>";
-                echo "<td><select class='form-control' name='test' readonly>";
-                if(count($f->getMod()->getFormativeFeedback()) > 0){
-                    foreach($f->getMod()->getFormativeFeedback() as $s){
-                        echo "<option>".$s."</option>";
-                    }
-                }
-                else{
-                    echo "<option>No Feedbacks Given</option>";
-                }
-                echo "</select></td>";
-                //subcomponent
-                echo "<td><select class='form-control' name='test' readonly>";
-                foreach($f->getMod()->getAllComponent() as $comp){
-                    foreach($comp->getSub() as $cs){
-                        echo "<option>";
-                        echo $cs->getName();
-                        echo "</option>";
-                    }
-                }
-                echo "</select></td>";
-                echo "</tr>";
-            }
-            echo"   </table>
-                </div>";
-         }
+          <button type="button" @click="addModule();">Confirm</button>
+        </div>
+      </div>
+    </form>
+    <?php
         include "footer.php";
     ?>  
     <script src="js/createPageProf.js"></script>
