@@ -9,8 +9,15 @@ include "classes/ProfessorDictionaryAdapter.php";
 session_start();
 $Details = "";
 
+
+if ($_SERVER['REQUEST_METHOD'] != 'POST') {
+   header("Location:createPageProf.php");
+   exit;
+ }
+
 if(!isset($_SESSION['sessionInfo'])){
     header("Location:loginPage.php");
+    exit;
 }
 else{
     $Details = $_SESSION['sessionInfo'];
@@ -23,7 +30,7 @@ else{
             $_SESSION["errormsg"] = $errormsg;
             header("Location:loginPage.php");
         }
-        else{
+        else {
             echo '<h2>success</h2>';
             $module = usersFactory::getModuleInfo($conn, '1');
             $Details->setMod($module);
@@ -34,23 +41,6 @@ else{
         }
     }
 }
-
-//if ($conn->connect_error)
-//{
-//    $errormsg .= $conn->connect_error;
-//    $_SESSION["errormsg"] = $errormsg;
-//    header("Location:loginPage.php");
-//}
-//else{
-//   #$module = usersFactory::getModuleInfo($conn, '1');
-//   #$Details->setMod($module);
-//    if($Details->getRole() == "professor"){
-//   
-//    }
-//    else{
-//       echo '<h2>noo success</h2>'; 
-//    }
-//}
 ?>
 
 

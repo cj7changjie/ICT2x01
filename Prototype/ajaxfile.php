@@ -79,6 +79,23 @@ else if($request == 5){
     mysqli_query($conn,"INSERT INTO userSummative(summativeid, studentid,subAssessment_name) VALUES('".$summativeid."','".$student."','".$subassessmentname."')");
     #$Details->setMod($module);
     exit;
+} else if ($request == 6) 
+{    
+    $studentids = $data->studentids;
+    $queryString = "";
+    for ($i = 0; $i < count($studentids); $i++) {
+        $idString = "\"${studentids[$i]}\"";
+        $queryString = "{$queryString}{$idString}";
+        if ($i != count($studentids) - 1) {
+            $queryString = "${queryString},";
+        }
+    }
+    $result = mysqli_query($conn, "SELECT studentid FROM users WHERE users.studentid IN (". $queryString .")");
+    if ($result) {
+        $num_rows = mysqli_num_rows($result);
+        echo $num_rows;
+    }
+    exit;
 }
 
 ?>
